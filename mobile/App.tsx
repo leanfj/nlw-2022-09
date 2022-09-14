@@ -1,50 +1,20 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, TouchableOpacity, Vibration, View } from 'react-native';
+import { StatusBar } from 'react-native';
+import { Background } from './src/components/Background';
+import {useFonts, Inter_400Regular, Inter_600SemiBold, Inter_700Bold, Inter_900Black} from '@expo-google-fonts/inter'
+import { Home } from './src/screens/Home';
+import { Loader } from './src/components/Loader';
 
 export default function App() {
+  const [fontsLoad] = useFonts({
+    Inter_400Regular, Inter_600SemiBold, Inter_700Bold, Inter_900Black
+  })
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.tile}>Ola Mundo!</Text>
-      <Button title='Botao'></Button>
-      <StatusBar style="auto" />
-    </View>
+
+    <Background >
+      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent/>
+      {fontsLoad ? <Home /> : <Loader/>}
+    </Background>
   );
 }
 
-interface ButtonProps {
-  title: string;
-}
-
-function Button(props: ButtonProps) {
-  return (
-    <TouchableOpacity style={styles.button} onPress={() => Vibration.vibrate(10 * 1000)}>
-      <Text style={styles.buttonText}>{props.title}</Text>
-    </TouchableOpacity>
-  )
-}
-
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  tile: {
-    color: '#fff',
-    fontSize: 28,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-  },
-  button: {
-    backgroundColor: '#996DFF',
-    padding: 10,
-    marginTop: 20,
-    borderRadius: 5,
-  }
-
-});
