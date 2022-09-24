@@ -16,7 +16,7 @@ import { DuoCard, DuoCardProps } from '../../components/DuoCard'
 import { Heading } from '../../components/Heading'
 
 import { styles } from './styles'
-import { GameCardProps } from '../../components/GameCard'
+import { DuoMatch } from '../../components/DuoMatch'
 
 export function Game() {
   const route = useRoute()
@@ -30,9 +30,11 @@ export function Game() {
   }
 
   const [ads, setAds] = useState<DuoCardProps[]>([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [discord, setDiscord] = useState('');
 
   useEffect(() => {
-    fetch((`http://192.168.15.126:3333/games/${game.id}/ads`)).then(response => response.json()).then(data => setAds(data));
+    fetch((`http://192.168.15.20:3333/games/${game.id}/ads`)).then(response => response.json()).then(data => setAds(data));
   }, []);
 
   return (
@@ -52,7 +54,17 @@ export function Game() {
           data={ads}
           keyExtractor={item => item.id}
           renderItem={({ item }) => (
-            <DuoCard data={item} onConnect={() => { }} />
+            <DuoCard data={item} onConnect={() => {
+              fetch((`http://192.168.15.20:3333/ads/${item.id}/discord`)).then(response => response.json()).then(data => {
+                setDiscord(data.discord)
+
+              }).then(() => {
+                setModalVisible(true)
+
+              })
+
+            }} />
+
           )}
           showsHorizontalScrollIndicator={false}
           horizontal
@@ -65,6 +77,10 @@ export function Game() {
           )}
         />
 
+        <DuoMatch 
+          visible={modalVisible}
+          discord={discord}
+          onClose={() => setModalVisible(!modalVisible)} />
       </SafeAreaView>
     </Background>
   )
