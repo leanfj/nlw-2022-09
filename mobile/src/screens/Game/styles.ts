@@ -6,6 +6,6 @@ export const styles = StyleSheet.create({
   logo: {width: 72, height: 40},
   right: {width: 20, height: 20},
   banner: {height: 160, width: 311, marginTop: 20, borderRadius: 8 },
-  contentList: {paddingLeft: 32, paddingRight: 64, marginTop: 20, alignItems: 'flex-start'},
+  contentList: {paddingLeft: 32, paddingRight: 64, height: '100%', alignItems: 'flex-start'},
   containerList: { width: '100%'}
 });
