@@ -3,6 +3,8 @@ import cors from 'cors'
 import { PrismaClient } from '@prisma/client';
 import { convertHoursToMin } from './utils/convertHoursToMin';
 import { convertMinToHours } from './utils/convertMinToHours';
+import CreateAds from './application/CreateAds';
+import GetAdsByGame from './application/GetAdByGame';
 
 const app = express();
 app.use(express.json());
@@ -24,57 +26,23 @@ app.get('/games', async (request, response) => {
 })
 
 app.post('/games/:id/ads', async (request, response) => {
-    const { id } = request.params;
-
-    const ad = {
-        name: request.body.name,
-        hourStart: convertHoursToMin(request.body.hourStart),
-        hourEnd: convertHoursToMin(request.body.hourEnd),
-        discord: request.body.discord,
-        gameId: id,
-        weekDays: request.body.weekDays.join(','),
-        useVoiceChannel: request.body.useVoiceChannel,
-        yearsPlaying: request.body.yearsPlaying
-    }
-
-    const adCreated = await prisma.ad.create({
-        data: ad
-    })
+    const createAds = new CreateAds()
+    
+    const { name, hourStart, hourEnd, weekDays, useVoiceChannel, yearsPlaying, discord } = request.body;
+    const id = request.params.id;
+    
+    const adCreated = await createAds.execute({ name, hourStart, hourEnd, weekDays, useVoiceChannel, yearsPlaying, discord, gameId: id })
 
     response.status(201).json(adCreated);
 })
 
 app.get('/games/:id/ads', async (request, response) => {
 
-    const { id } = request.params;
+    const id = request.params.id;
 
-    const ads = await prisma.ad.findMany({
-        select: {
-            id: true,
-            hourEnd: true,
-            hourStart: true,
-            name: true,
-            useVoiceChannel: true,
-            weekDays: true,
-            yearsPlaying: true,
+    const adsByGame = new GetAdsByGame()
 
-        },
-        where: {
-            gameId: id
-        },
-        orderBy: {
-            createdAt: 'desc'
-        }
-    })
-
-    const formatedAds = ads.map(ad => {
-        return {
-            ...ad,
-            weekDays: ad.weekDays.split(',').map(Number),
-            hourEnd: convertMinToHours(ad.hourEnd),
-            hourStart: convertMinToHours(ad.hourStart)
-        }
-    })
+    const formatedAds = adsByGame.execute(id)
 
     response.json(formatedAds);
 })
